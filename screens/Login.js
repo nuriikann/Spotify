@@ -1,11 +1,33 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Touchable, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, SafeAreaView, Image, TouchableOpacity } from 'react-native'
+import React, {useEffect} from 'react'
 import { LinearGradient } from 'expo-linear-gradient';
 import * as AppAuth from 'expo-app-auth'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
+    const navigation = useNavigation();
+    useEffect(() => {
+        const checkTokenValidty = async () => {
+            const accessToken = await AsyncStorage.getItem('token');
+            const expirationDate = await AsyncStorage.getItem('expirationDate');
+            console.log("access token",accessToken);
+            console.log("expiration date",expirationDate);
 
+            if(accessToken && expirationDate){
+                const currentTime = Date.now()
+                if(currentTime < parseInt(expirationDate)){
+                    //token hala gecerli mi kontrolu
+                    navigation.replace('Main')
+                } else {
+                    //token gecerli degilse
+                    AsyncStorage.removeItem('token')
+                    AsyncStorage.removeItem('expirationDate')
+                }
+            }
+        }
+        checkTokenValidty()
+    },[])
     async function authenticate(){
         const config ={
             issuer: 'https://accounts.spotify.com',
@@ -23,14 +45,20 @@ const Login = () => {
         }
 
         const results = await AppAuth.authAsync(config)
+        if(results.accessToken){
+            const expirationDate = new Date(results.accessTokenExpirationDate).getDate
+            AsyncStorage.setItem('token',results.accessToken)
+            AsyncStorage.setItem("expirationDate",expirationDate.toString());
+            navigation.navigate('Main')
+        }
     }
   return (
     <LinearGradient colors={['#040306', '#131624']} style={{flex:1}}>
         <SafeAreaView>
             <View style={{height:80}}/>
-            <Image style={styles.logo} source={require('../assets/spotify-logo.png')}></Image>
+            <Image style={styles.logo} source={require('../assets/spotify-logo.png')} />
             <Text style={styles.logoText}>Millions of Songs Free on spotify!</Text>
-            <View style= {{marginTop: 50}}>
+            <View style={{marginTop: 50}}>
                 <TouchableOpacity onPress={authenticate} style={styles.spotifyBtn}>
                     <Text style={{fontSize: 15}}>Sign in with Spotify</Text>
                 </TouchableOpacity>
@@ -50,7 +78,7 @@ const Login = () => {
         </SafeAreaView>
     </LinearGradient>   
     
-  )
+  ) //Istakoz96 nuri.kann@outlook.com
 }
 
 export default Login
@@ -85,7 +113,7 @@ const styles = StyleSheet.create({
             marginVertical:10,
     },
     logInBtn: {
-        backgroundColor: "#131624",
+        backgroundColor: "transparent",
             padding: 10,
             marginLeft: "auto",
             marginRight: "auto",
