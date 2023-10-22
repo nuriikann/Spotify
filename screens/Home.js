@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
+import ArtistCard from '../components/ArtistCard'
+import RecentlyPlayedCard from '../components/RecentlyPlayedCard'
 
 const styles = StyleSheet.create ({
   navlogo: {
@@ -119,7 +121,7 @@ const HomeScreen = () => {
         <ScrollView style={{marginTop: 50}}>
           <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10}}>
             <View style={{flexDirection: 'row', alignItems:'center'}}>
-            <Image style={{width:40, height:40, borderRadius: 20, resizeMode: 'cover', marginLeft: 10}} source={{uri:userProfile?.images[0].url}}/>
+              <Image style={{width:40, height:40, borderRadius: 20, resizeMode: 'cover', marginLeft: 10}} source={{uri:userProfile?.images[0].url}}/>
               <Text style={{marginLeft: 10, fontSize: 20, fontWeight: 'bold', color: 'white'}}>{message}</Text>
             </View>
             <Image style={{height: 25, width: 25}} source={require ('../assets/icons/settings-light.png')}/>
@@ -179,6 +181,15 @@ const HomeScreen = () => {
             </View>
           </View>
           <FlatList data={recentlyPlayed} renderItem={renderItem} numColumns={2} columnWrapperStyle={{justifyContent: 'space-between'}}/>
+          <Text style={{color:'white', fontSize: 19, fontWeight:'bold', marginHorizontal: 10, marginTop: 10}}>Your Top Artists</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {topArtist.map((item,index) => (
+              <ArtistCard item={item} key={index}/>
+            ))}
+          </ScrollView>
+          <View style={{height: 10}}/>
+          <Text style={{color:'white', fontSize: 19, fontWeight:'bold', marginHorizontal: 10}}>Recently Played</Text>
+          <FlatList horizontal showsHorizontalScrollIndicator={false} data={recentlyPlayed} renderItem={({item,index}) => <RecentlyPlayedCard item={item} key={index}/>}/>
         </ScrollView>
     </LinearGradient>
     

@@ -76,7 +76,7 @@ const Login = () => {
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
-    </LinearGradient>   
+    </LinearGradient>
     
   ) //Istakoz96 nuri.kann@outlook.com
 }
